@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Advisor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0B1220;
+    --panel: #131B2E;
+    --panel-hover: #182238;
+    --border: #22304A;
+    --text: #E8EAF0;
+    --text-dim: #8A93A8;
+    --buy: #3FB68B;
+    --avoid: #D9605A;
+    --watch: #C9A15A;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .app {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    height: 100vh;
+  }
+
+  /* --- Left rail --- */
+  .rail {
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .rail-header {
+    padding: 24px 20px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .rail-header h1 {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .rail-header p {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  .ticker-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .ticker-row:hover { background: var(--panel-hover); }
+  .ticker-row.active { background: var(--panel-hover); box-shadow: inset 3px 0 0 var(--text); }
+
+  .ticker-left { display: flex; align-items: center; gap: 12px; }
+
+  .rank-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    width: 18px;
+  }
+
+  .ticker-symbol {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 3px;
+  }
+
+  .tag.Buy { color: var(--buy); background: rgba(63, 182, 139, 0.12); }
+  .tag.Watch { color: var(--watch); background: rgba(201, 161, 90, 0.12); }
+  .tag.Avoid { color: var(--avoid); background: rgba(217, 96, 90, 0.12); }
+
+  /* --- Main panel --- */
+  .main {
+    padding: 32px 40px;
+    overflow-y: auto;
+  }
+
+  .main-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 4px;
+  }
+
+  .main-header h2 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 28px;
+    font-weight: 600;
+  }
+
+  .price {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 20px;
+    color: var(--text-dim);
+  }
+
+  .reasoning {
+    max-width: 640px;
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 12px 0 28px;
+  }
+
+  .chart-wrap {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+    height: 340px;
+    margin-bottom: 28px;
+  }
+
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .metric {
+    background: var(--panel);
+    padding: 16px 20px;
+  }
+
+  .metric-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+
+  .metric-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .loading {
+    color: var(--text-dim);
+    font-size: 14px;
+    padding: 40px 20px;
+    text-align: center;
+  }
+
+  .refresh-btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 12px;
+    cursor: pointer;
+    margin: 12px 20px;
+  }
+
+  .refresh-btn:hover { color: var(--text); border-color: var(--text-dim); }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="rail">
+    <div class="rail-header">
+      <h1>Stock Advisor</h1>
+      <p>SQL-driven technical analysis, ranked by AI</p>
+    </div>
+    <div id="ticker-list" class="loading">Loading rankings...</div>
+    <button class="refresh-btn" id="refresh-btn">Refresh recommendations</button>
+  </div>
+
+  <div class="main" id="main-panel">
+    <div class="loading">Select a ticker to view details</div>
+  </div>
+</div>
+
+<script>
+let recommendations = null;
+let activeChart = null;
+
+async function loadRecommendations() {
+  const res = await fetch('/api/recommendations');
+  recommendations = await res.json();
+  renderTickerList();
+  if (recommendations.rankings.length > 0) {
+    selectTicker(recommendations.rankings[0].ticker);
+  }
+}
+
+function renderTickerList() {
+  const list = document.getElementById('ticker-list');
+  list.className = '';
+  list.innerHTML = '';
+  recommendations.rankings.forEach(entry => {
+    const row = document.createElement('div');
+    row.className = 'ticker-row';
+    row.dataset.ticker = entry.ticker;
+    row.innerHTML = `
+      <div class="ticker-left">
+        <span class="rank-num">${entry.rank}</span>
+        <span class="ticker-symbol">${entry.ticker}</span>
+      </div>
+      <span class="tag ${entry.recommendation}">${entry.recommendation}</span>
+    `;
+    row.addEventListener('click', () => selectTicker(entry.ticker));
+    list.appendChild(row);
+  });
+}
+
+async function selectTicker(ticker) {
+  document.querySelectorAll('.ticker-row').forEach(r => {
+    r.classList.toggle('active', r.dataset.ticker === ticker);
+  });
+
+  const entry = recommendations.rankings.find(r => r.ticker === ticker);
+  const [pricesRes, snapshotsRes] = await Promise.all([
+    fetch(`/api/prices/${ticker}`),
+    fetch('/api/snapshots')
+  ]);
+  const prices = await pricesRes.json();
+  const snapshots = await snapshotsRes.json();
+  const snapshot = snapshots.find(s => s.ticker === ticker);
+
+  renderDetail(ticker, entry, prices, snapshot);
+}
+
+function renderDetail(ticker, entry, prices, snapshot) {
+  const main = document.getElementById('main-panel');
+  main.innerHTML = `
+    <div class="main-header">
+      <h2>${ticker}</h2>
+      <span class="price">$${snapshot.close}</span>
+      <span class="tag ${entry.recommendation}">${entry.recommendation}</span>
+    </div>
+    <p class="reasoning">${entry.reasoning}</p>
+    <div class="chart-wrap"><canvas id="price-chart"></canvas></div>
+    <div class="metrics">
+      <div class="metric"><div class="metric-label">20-day MA</div><div class="metric-value">$${snapshot.ma_20}</div></div>
+      <div class="metric"><div class="metric-label">50-day MA</div><div class="metric-value">$${snapshot.ma_50}</div></div>
+      <div class="metric"><div class="metric-label">RSI (14)</div><div class="metric-value">${snapshot.rsi}</div></div>
+      <div class="metric"><div class="metric-label">MACD</div><div class="metric-value">${snapshot.macd}</div></div>
+    </div>
+  `;
+
+  const ctx = document.getElementById('price-chart').getContext('2d');
+  if (activeChart) activeChart.destroy();
+  activeChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: prices.map(p => p.date),
+      datasets: [
+        {
+          label: 'Close',
+          data: prices.map(p => p.close),
+          borderColor: '#E8EAF0',
+          borderWidth: 1.5,
+          pointRadius: 0,
+          tension: 0.1
+        },
+        {
+          label: '20-day MA',
+          data: prices.map(p => p.ma_20),
+          borderColor: '#3FB68B',
+          borderWidth: 1.5,
+          pointRadius: 0,
+          tension: 0.1
+        },
+        {
+          label: '50-day MA',
+          data: prices.map(p => p.ma_50),
+          borderColor: '#C9A15A',
+          borderWidth: 1.5,
+          pointRadius: 0,
+          tension: 0.1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      scales: {
+        x: { ticks: { color: '#8A93A8', maxTicksLimit: 8 }, grid: { color: '#22304A' } },
+        y: { ticks: { color: '#8A93A8' }, grid: { color: '#22304A' } }
+      },
+      plugins: {
+        legend: { labels: { color: '#8A93A8', boxWidth: 12, font: { size: 11 } } }
+      }
+    }
+  });
+}
+
+document.getElementById('refresh-btn').addEventListener('click', async () => {
+  document.getElementById('ticker-list').innerHTML = '<div class="loading">Refreshing...</div>';
+  const res = await fetch('/api/recommendations/refresh', { method: 'POST' });
+  recommendations = await res.json();
+  renderTickerList();
+  if (recommendations.rankings.length > 0) {
+    selectTicker(recommendations.rankings[0].ticker);
+  }
+});
+
+loadRecommendations();
+</script>
+
+</body>
+</html>
