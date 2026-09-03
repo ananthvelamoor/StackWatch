@@ -1,0 +1,112 @@
+{
+  "rankings": [
+    {
+      "rank": 1,
+      "ticker": "NFLX",
+      "recommendation": "Buy",
+      "reasoning": "Price ($80.81) is above both MA20 ($78.23) and MA50 ($74.88) in a clean uptrend. MACD (1.87) is above its signal line (1.63), confirming bullish momentum. RSI at 67.5 shows strength without being dangerously overbought."
+    },
+    {
+      "rank": 2,
+      "ticker": "MSFT",
+      "recommendation": "Buy",
+      "reasoning": "Powerful long-term uptrend with MA20 ($494) well above MA50 ($435) and price ($501) above both. RSI (56.6) is healthy/neutral. MACD is still strongly positive (17.89) despite being slightly below signal, suggesting a normal pause in a dominant uptrend rather than a reversal."
+    },
+    {
+      "rank": 3,
+      "ticker": "JNJ",
+      "recommendation": "Buy",
+      "reasoning": "Price ($271.19) sits above both MA20 ($263.89) and MA50 ($257.82), confirming an uptrend. RSI (64.8) is firm but not overbought. MACD (3.97) is essentially in line with signal (4.01), indicating stable bullish momentum."
+    },
+    {
+      "rank": 4,
+      "ticker": "XOM",
+      "recommendation": "Buy",
+      "reasoning": "Steady uptrend with price ($164.55) above MA20 ($159.52) and MA50 ($150.42). RSI (59.9) is moderate. MACD is positive (2.87) though slightly below signal, suggesting healthy consolidation within an uptrend rather than weakness."
+    },
+    {
+      "rank": 5,
+      "ticker": "DIS",
+      "recommendation": "Buy",
+      "reasoning": "Price ($106.22) is essentially at MA20 ($106.13) and above MA50 ($100.78), showing a constructive uptrend. RSI (56.7) is balanced. MACD is positive and only marginally below signal, indicating mild consolidation, not reversal."
+    },
+    {
+      "rank": 6,
+      "ticker": "KO",
+      "recommendation": "Buy",
+      "reasoning": "Price ($88.00) is just below MA20 ($88.48) but above MA50 ($85.39), consistent with a gentle uptrend. RSI (56.9) is neutral-to-firm. MACD is slightly below signal, a minor caution flag, but overall trend remains constructive."
+    },
+    {
+      "rank": 7,
+      "ticker": "PEP",
+      "recommendation": "Watch",
+      "reasoning": "Price ($139.79) is sandwiched between MA20 ($140.45) and MA50 ($139.76), signaling a sideways/consolidating market. RSI (52.8) and MACD near signal line show no clear directional conviction \u2014 needs a breakout to confirm direction."
+    },
+    {
+      "rank": 8,
+      "ticker": "CVX",
+      "recommendation": "Watch",
+      "reasoning": "Strong uptrend (price $211 well above MA20 $198.9 and MA50 $187.6) with MACD bullish, but RSI at 78 is deeply overbought, raising near-term pullback risk despite the strong trend."
+    },
+    {
+      "rank": 9,
+      "ticker": "AAPL",
+      "recommendation": "Watch",
+      "reasoning": "Price ($325.13) is far above MA20 ($311.28) and MA50 ($312.76), and RSI (75.4) is extremely overbought. MACD is positive but the stretched RSI suggests the rally is overextended and vulnerable to a correction."
+    },
+    {
+      "rank": 10,
+      "ticker": "PFE",
+      "recommendation": "Watch",
+      "reasoning": "Uptrend intact (price $28.55 above MA20 $27.29 and MA50 $25.45) with MACD marginally bullish, but RSI at 70.2 is overbought, warranting caution before adding on strength."
+    },
+    {
+      "rank": 11,
+      "ticker": "TSLA",
+      "recommendation": "Watch",
+      "reasoning": "Highly volatile \u2014 price swung from ~$374 to ~$298 and back to $356 over the past month. MACD (1.9) has crossed decisively above signal (-1.83), a bullish signal, but price remains just below MA50 ($358.84), so trend confirmation is still needed."
+    },
+    {
+      "rank": 12,
+      "ticker": "NVDA",
+      "recommendation": "Watch",
+      "reasoning": "Price ($217.44) is consolidating near MA20 ($219.03) after pulling back from a recent high of $227.98. RSI (44.6) and MACD slightly below signal reflect indecision rather than a clear trend."
+    },
+    {
+      "rank": 13,
+      "ticker": "JPM",
+      "recommendation": "Watch",
+      "reasoning": "Price ($354.95) has pulled back below MA20 ($358.15) but remains above MA50 ($347.50). MACD (2.13) below signal (3.55) shows softening momentum within an otherwise intact medium-term uptrend."
+    },
+    {
+      "rank": 14,
+      "ticker": "BAC",
+      "recommendation": "Watch",
+      "reasoning": "Price ($61.99) is range-bound between MA20 ($63.02) and MA50 ($61.23). RSI (37.8) and MACD below signal indicate mild bearish pressure, but the stock has been oscillating in a tight range with no strong trend."
+    },
+    {
+      "rank": 15,
+      "ticker": "AMZN",
+      "recommendation": "Watch",
+      "reasoning": "Sharp post-earnings spike to ~$284 in early August has fully reversed, with price now at $254.92, below MA20 ($264.55) but still above MA50 ($252.41). MACD below signal confirms fading momentum; needs to stabilize above MA50 to avoid further downside."
+    },
+    {
+      "rank": 16,
+      "ticker": "WMT",
+      "recommendation": "Watch",
+      "reasoning": "Sharp gap down from ~$114 to ~$103.6 in late August signals a negative catalyst, and price ($105.92) remains below MA20 ($109.50) and MA50 ($111.31). RSI (29.5) is oversold and price has ticked up the last few sessions, suggesting a possible bounce, but the broader trend is still bearish."
+    },
+    {
+      "rank": 17,
+      "ticker": "GOOGL",
+      "recommendation": "Avoid",
+      "reasoning": "Clear downtrend from an early-August peak near $377 to $335 today, with price below both MA20 ($346.43) and MA50 ($348.91). MACD (-2.92) is negative and below signal (-2.2), confirming persistent bearish momentum."
+    },
+    {
+      "rank": 18,
+      "ticker": "GS",
+      "recommendation": "Avoid",
+      "reasoning": "Steady decline from ~$1099 to $1002.56, with price well below MA20 ($1036.67) and MA50 ($1048.26). MACD is deeply negative (-5.46) versus signal (-3.83), indicating strong and accelerating downward momentum."
+    }
+  ]
+}

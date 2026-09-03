@@ -178,6 +178,35 @@
     text-align: center;
   }
 
+  .mode-toggle {
+    display: flex;
+    margin: 0 20px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px;
+  }
+
+  .mode-btn {
+    flex: 1;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    padding: 8px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--text-dim);
+    background: none;
+    border: none;
+    transition: all 0.15s ease;
+  }
+
+  .mode-btn.active {
+    background: var(--panel-hover);
+    color: var(--text);
+  }
+
   .refresh-btn {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 12px;
@@ -201,6 +230,10 @@
       <h1>StackWatch</h1>
       <p>SQL-driven technical analysis, ranked by AI</p>
     </div>
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="mode-single" data-mode="single">Single-Shot</button>
+      <button class="mode-btn" id="mode-agentic" data-mode="agentic">Agentic</button>
+    </div>
     <div id="ticker-list" class="loading">Loading rankings...</div>
     <button class="refresh-btn" id="refresh-btn">Refresh recommendations</button>
   </div>
@@ -213,15 +246,38 @@
 <script>
 let recommendations = null;
 let activeChart = null;
+let currentMode = 'single';
+
+const ENDPOINTS = {
+  single: { get: '/api/recommendations', refresh: '/api/recommendations/refresh' },
+  agentic: { get: '/api/recommendations/agentic', refresh: '/api/recommendations/agentic/refresh' }
+};
 
 async function loadRecommendations() {
-  const res = await fetch('/api/recommendations');
+  document.getElementById('ticker-list').className = 'loading';
+  document.getElementById('ticker-list').innerHTML =
+    currentMode === 'agentic'
+      ? 'Agent is investigating stocks (this can take a minute)...'
+      : 'Loading rankings...';
+
+  const res = await fetch(ENDPOINTS[currentMode].get);
   recommendations = await res.json();
   renderTickerList();
   if (recommendations.rankings.length > 0) {
     selectTicker(recommendations.rankings[0].ticker);
   }
 }
+
+function switchMode(mode) {
+  if (mode === currentMode) return;
+  currentMode = mode;
+  document.getElementById('mode-single').classList.toggle('active', mode === 'single');
+  document.getElementById('mode-agentic').classList.toggle('active', mode === 'agentic');
+  loadRecommendations();
+}
+
+document.getElementById('mode-single').addEventListener('click', () => switchMode('single'));
+document.getElementById('mode-agentic').addEventListener('click', () => switchMode('agentic'));
 
 function renderTickerList() {
   const list = document.getElementById('ticker-list');
@@ -327,8 +383,11 @@ function renderDetail(ticker, entry, prices, snapshot) {
 }
 
 document.getElementById('refresh-btn').addEventListener('click', async () => {
-  document.getElementById('ticker-list').innerHTML = '<div class="loading">Refreshing...</div>';
-  const res = await fetch('/api/recommendations/refresh', { method: 'POST' });
+  document.getElementById('ticker-list').innerHTML =
+    currentMode === 'agentic'
+      ? '<div class="loading">Agent is re-investigating (this can take a minute)...</div>'
+      : '<div class="loading">Refreshing...</div>';
+  const res = await fetch(ENDPOINTS[currentMode].refresh, { method: 'POST' });
   recommendations = await res.json();
   renderTickerList();
   if (recommendations.rankings.length > 0) {

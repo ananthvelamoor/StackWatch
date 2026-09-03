@@ -13,10 +13,12 @@ import pandas as pd
 
 from analysis import get_moving_averages, get_rsi, add_macd
 from agent import get_latest_snapshot, get_recommendations
+from agentic_agent import run_agent
 
 app = Flask(__name__)
 DB_PATH = "stocks.db"
 CACHE_PATH = "recommendations_cache.json"
+AGENTIC_CACHE_PATH = "agentic_recommendations_cache.json"
 
 
 def get_conn():
@@ -87,6 +89,35 @@ def api_refresh_recommendations():
     result = get_recommendations(snapshots)
 
     with open(CACHE_PATH, "w") as f:
+        json.dump(result, f, indent=2)
+
+    return jsonify(result)
+
+
+@app.route("/api/recommendations/agentic")
+def api_agentic_recommendations():
+    """
+    Agentic version: Claude uses tools to query the database itself rather than
+    receiving a pre-built snapshot. Returns cached result if available.
+    """
+    if os.path.exists(AGENTIC_CACHE_PATH):
+        with open(AGENTIC_CACHE_PATH, "r") as f:
+            return jsonify(json.load(f))
+
+    result = run_agent()
+
+    with open(AGENTIC_CACHE_PATH, "w") as f:
+        json.dump(result, f, indent=2)
+
+    return jsonify(result)
+
+
+@app.route("/api/recommendations/agentic/refresh", methods=["POST"])
+def api_refresh_agentic_recommendations():
+    """Forces a fresh agentic run, overwriting the agentic cache."""
+    result = run_agent()
+
+    with open(AGENTIC_CACHE_PATH, "w") as f:
         json.dump(result, f, indent=2)
 
     return jsonify(result)
